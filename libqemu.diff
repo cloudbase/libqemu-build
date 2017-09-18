@@ -1,0 +1,26 @@
+diff --git a/Makefile b/Makefile
+index b53fc69a60..d9a93af296 100644
+--- a/Makefile
++++ b/Makefile
+@@ -364,6 +364,8 @@ COMMON_LDADDS = libqemuutil.a libqemustub.a
+
+ qemu-img.o: qemu-img-cmds.h
+
++libqemu: $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++	gcc -o libqemu.so -shared $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS) -lnfs -lz -lglib-2.0 -laio
+ qemu-img$(EXESUF): qemu-img.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-nbd$(EXESUF): qemu-nbd.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-io$(EXESUF): qemu-io.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+diff --git a/rules.mak b/rules.mak
+index 6e943335f3..1a3b2d5087 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -64,7 +64,7 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+
+ %.o: %.c
+ 	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+-	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
++	       $(QEMU_CFLAGS) -fPIC  $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
+ 	       -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+ %.o: %.rc
+ 	$(call quiet-command,$(WINDRES) -I. -o $@ $<,"RC","$(TARGET_DIR)$@")
